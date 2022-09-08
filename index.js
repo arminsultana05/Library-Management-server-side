@@ -16,7 +16,14 @@ async function  run(){
     try{
 
         await client.connect();
-        console.log('database connected');
+       const bookCollections = client.db('library_management').collection('all_books');
+       app.get('/books', async(req,res)=>{
+        const query ={};
+        const cursor = bookCollections.find(query);
+        const books = await cursor.toArray()
+        res.send(books)
+
+       })
     }
     finally{
 
