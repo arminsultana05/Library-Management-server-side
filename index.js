@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000
 require('dotenv').config();
@@ -18,6 +18,7 @@ async function  run(){
         await client.connect();
        const bookCollections = client.db('library_management').collection('all_books');
        const studentCollections = client.db('library_management').collection('all_request');
+       const userCollections = client.db('library_management').collection('users');
        app.get('/books', async(req,res)=>{
         const query ={};
         const cursor = bookCollections.find(query);
@@ -25,12 +26,52 @@ async function  run(){
         res.send(books)
 
        })
+       app.put('/user/:email', async(req,res)=>{
+        const email =req.params.email;
+        const user = req.body;
+
+        const filter ={email:email};
+        const option ={upsert:true};
+        const updateDoc={
+          $set:user,
+        };
+        const result = await userCollections.updateOne(filter, updateDoc,option)
+        res.send(result)
+       });
+
+       app.get('/all-request', async(req,res)=>{
+        const query ={};
+        const cursor = studentCollections.find(query);
+        const books = await cursor.toArray()
+        res.send(books)
+
+       })
+       app.get('/request', async(req, res)=>{
+        const email =req.query.email;
+        const query ={email:email}
+        const request = await studentCollections.find(query).toArray();
+        res.send(request);
+
+       })
+    //    app.delete('/request/:id', async (req, res) => {
+    //     const id = req.params.id;
+    //     const query = { _id: ObjectId(id) };
+    //     const result = await studentCollections.deleteOne(query);
+    //     res.send(result);
+    // })
+
        app.post('/student',async(req,res)=>{
         const student =req.body;
         const result = await studentCollections.insertOne(student);
         res.send(result)
 
        })
+    //    app.delete('/request/:id', async (req, res) => {
+    //     const id = req.params.id;
+    //     const query = { _id: ObjectId(id) };
+    //     const orders = await studentCollections.deleteOne(query);
+    //     res.send(orders);
+    // })
     }
     finally{
 
