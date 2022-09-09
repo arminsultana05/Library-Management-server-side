@@ -17,11 +17,18 @@ async function  run(){
 
         await client.connect();
        const bookCollections = client.db('library_management').collection('all_books');
+       const studentCollections = client.db('library_management').collection('all_request');
        app.get('/books', async(req,res)=>{
         const query ={};
         const cursor = bookCollections.find(query);
         const books = await cursor.toArray()
         res.send(books)
+
+       })
+       app.post('/student',async(req,res)=>{
+        const student =req.body;
+        const result = await studentCollections.insertOne(student);
+        res.send(result)
 
        })
     }
