@@ -38,6 +38,10 @@ async function  run(){
         const result = await userCollections.updateOne(filter, updateDoc,option)
         res.send(result)
        });
+       app.get('/users', async(req,res)=>{
+        const user = await userCollections.find().toArray();
+        res.send(user)
+       })
 
        app.get('/all-request', async(req,res)=>{
         const query ={};
@@ -59,6 +63,23 @@ async function  run(){
     //     const result = await studentCollections.deleteOne(query);
     //     res.send(result);
     // })
+    //make admin
+    app.put('/user/admin/:email', async(req,res)=>{
+      const email =req.params.email;
+      const filter ={email:email};
+        const updateDoc={
+        $set:{role:'admin'},
+      };
+      const result = await userCollections.updateOne(filter, updateDoc,)
+      res.send(result)
+     });
+     app.get('/admin/:email', async(req,res)=>{
+      const email = req.params.email;
+      const user = await userCollections.findOne({email:"email"});
+      const isAdmin = user.role ==='admin';
+      req.send({admin:isAdmin})
+     })
+
 
        app.post('/student',async(req,res)=>{
         const student =req.body;
